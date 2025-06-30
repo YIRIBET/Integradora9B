@@ -26,6 +26,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/templates" element={<Templates />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/mis-eventos" element={<MyEvent />} />
         {/* otras rutas  */}
       </Routes>
       <Footer />
