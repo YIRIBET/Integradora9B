@@ -43,7 +43,7 @@ function MyEvent() {
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="gray"
-              class="size-6 me-2"
+              class="size-6"
             >
               <path
                 stroke-linecap="round"
