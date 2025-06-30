@@ -1,14 +1,14 @@
 function LandigPage() {
   return (
     <div className="bg-gray-100 min-h-screen">
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-2 mt-5 me-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-2 me-6">
         <div className="me-3 max-w-2xl ml-5 mt-20 ">
           {/* Título principal */}
-          <h1 className="font-bold text-left text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-6 leading-tight">
+          <h1 className="font-bold text-left text-4xl md:text-5xl lg:text-6xl xl:text-6xl mb-6 leading-tight">
             Crea invitaciones digitales que impresionen
           </h1>
 
-          <p className="text-left text-base md:text-md text-gray-700 mb-8 leading-relaxed max-w-prose">
+          <p className="text-left text-base md:text-2xl text-gray-700 mb-8 leading-relaxed max-w-prose">
             Personaliza, envía y rastrea fácilmente las confirmaciones de
             asistencia. Haz que cada evento sea memorable con hermosas
             invitaciones digitales.
@@ -16,12 +16,12 @@ function LandigPage() {
 
           <div className="text-left">
             <div className="flex flex-wrap gap-4 mt-6">
-              <button className="bg-pink-500 hover:bg-pink-600 text-white font-medium py-2 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
+              <a href="/login" className="bg-pink-500 hover:bg-pink-600 text-white font-medium py-2 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
                 Empezar
-              </button>
-              <button className="bg-transparent hover:bg-pink-100 text-pink-500 font-medium py-2 px-8 rounded-full border-2 border-pink-500 transition-all duration-300">
+              </a>
+              <a href="/Home" className="bg-transparent hover:bg-pink-100 text-pink-500 font-medium py-2 px-8 rounded-full border-2 border-pink-500 transition-all duration-300">
                 Ver plantillas
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -167,7 +167,7 @@ function LandigPage() {
           </div>
         </div>
       </div>
-      <div className="bg-white justify-center align-center text-center mt-20 mb-10  ">
+      <div className="bg-white justify-center align-center text-center">
         <p className="font-bold  text-xl md:text-2xl lg:text-3xl xl:text-4xl mb-6 mt-10 leading-tight">
           Funciones potentes
         </p>

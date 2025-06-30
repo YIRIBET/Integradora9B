@@ -8,6 +8,12 @@ import LandingPage from './Components/LandingPage'
 import Footer from './Components/Footer'
 import Login from './Pages/auth/Login'
 import Registry from './Pages/auth/Registry'
+import Home from './Pages/User/Home'
+import Templates from './Pages/User/Templates'   
+import Profile from './Pages/User/Profile'
+import React from 'react'
+import MyEvent from './Pages/User/MyEvents'
+
 
 function App() {
   return (
@@ -17,6 +23,9 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registry" element={<Registry />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/templates" element={<Templates />} />
+        <Route path="/profile" element={<Profile />} />
         {/* otras rutas  */}
       </Routes>
       <Footer />
