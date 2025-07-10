@@ -13,6 +13,7 @@ import Templates from './Pages/User/Templates'
 import Profile from './Pages/User/Profile'
 import React from 'react'
 import MyEvent from './Pages/User/MyEvents'
+import Traking from './Pages/User/Traking'
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
         <Route path="/templates" element={<Templates />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/mis-eventos" element={<MyEvent />} />
+        <Route path="/traking" element={<Traking />} />
         {/* otras rutas  */}
       </Routes>
       <Footer />
