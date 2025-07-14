@@ -1,6 +1,6 @@
-// src/pages/RegisterPage.jsx
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 function Registry() {
   const [form, setForm] = useState({
@@ -8,18 +8,71 @@ function Registry() {
     apellido: '',
     email: '',
     password: '',
+    role: 'user'
   })
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault()
-    // Aquí debes enviar los datos a tu API
-    console.log('Datos enviados:', form)
-    navigate('/login')
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('http://localhost:3000/api/users/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        await Swal.fire({
+          title: '¡Registro exitoso!',
+          text: 'Tu cuenta ha sido creada correctamente',
+          icon: 'success',
+          confirmButtonText: 'Ir a login',
+          confirmButtonColor: '#ec4899',
+          timer: 3000,
+          
+          willClose: () => {
+            navigate('/login')
+          }
+        })
+      } else {
+        let errorMessage = data.message || 'Error al registrar usuario'
+        
+        // Manejo específico para errores de email duplicado
+        if (data.error?.includes('duplicate key error') || data.error?.includes('E11000')) {
+          errorMessage = 'El correo electrónico ya está registrado'
+        }
+
+        await Swal.fire({
+          title: 'Error en el registro',
+          text: errorMessage,
+          icon: 'error',
+          confirmButtonText: 'Entendido',
+          confirmButtonColor: '#ec4899'
+        })
+      }
+    } catch (error) {
+      await Swal.fire({
+        title: 'Error de conexión',
+        text: 'No se pudo conectar con el servidor',
+        icon: 'error',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#ec4899'
+      })
+      console.error('Error de red o servidor:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -76,6 +129,7 @@ function Registry() {
               type="password"
               name="password"
               required
+              minLength="6"
               className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
               value={form.password}
               onChange={handleChange}
@@ -84,9 +138,22 @@ function Registry() {
           </div>
           <button
             type="submit"
-            className="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-full transition-all duration-300"
+            disabled={isLoading}
+            className={`w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-full transition-all duration-300 flex justify-center items-center ${
+              isLoading ? 'opacity-75 cursor-not-allowed' : ''
+            }`}
           >
-            Registrarse
+            {isLoading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Procesando...
+              </>
+            ) : (
+              'Registrarse'
+            )}
           </button>
         </form>
         <p className="mt-6 text-center text-gray-500 text-sm">
