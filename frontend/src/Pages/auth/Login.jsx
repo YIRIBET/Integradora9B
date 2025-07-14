@@ -1,17 +1,56 @@
-// src/pages/LoginPage.jsx
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2' // Importar SweetAlert
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false) // Estado para manejar carga
   const navigate = useNavigate()
 
   const handleLogin = (e) => {
     e.preventDefault()
-    // Aquí deberías agregar la lógica para autenticar al usuario
-    console.log('Email:', email, 'Password:', password)
-    navigate('/dashboard') // Redirige si es exitoso
+    setIsLoading(true) // Activar estado de carga
+
+    fetch('http://localhost:3000/api/auth/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Login failed')
+        return res.json()
+      })
+      .then(data => {
+        // Guardar el token si lo recibes
+        localStorage.setItem('token', data.token)
+        
+        // Mostrar alerta de éxito
+        Swal.fire({
+          title: '¡Bienvenido!',
+          text: 'Has iniciado sesión correctamente',
+          icon: 'success',
+          confirmButtonText: 'Continuar',
+          confirmButtonColor: '#ec4899', // Color rosa para coincidir con tu diseño
+          timer: 2000,
+        }).then(() => {
+          navigate('/home')
+        })
+      })
+      .catch(err => {
+        // Mostrar alerta de error
+        Swal.fire({
+          title: 'Error',
+          text: 'Correo o contraseña incorrectos',
+          icon: 'error',
+          confirmButtonText: 'Entendido',
+          confirmButtonColor: '#ec4899'
+        })
+        console.error(err)
+      })
+      .finally(() => {
+        setIsLoading(false) // Desactivar estado de carga
+      })
   }
 
   return (
@@ -48,9 +87,10 @@ function Login() {
           </div>
           <button
             type="submit"
-            className="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-full transition-all duration-300"
+            disabled={isLoading} // Deshabilitar botón durante carga
+            className={`w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-full transition-all duration-300 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Iniciar sesión
+            {isLoading ? 'Cargando...' : 'Iniciar sesión'}
           </button>
         </form>
         <p className="mt-6 text-center text-gray-500 text-sm">
