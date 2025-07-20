@@ -9,12 +9,13 @@ import Footer from './Components/Footer'
 import Login from './Pages/auth/Login'
 import Registry from './Pages/auth/Registry'
 import Home from './Pages/User/Home'
-import Templates from './Pages/User/Templates'   
+import Templates from './Pages/User/Templates'
 import Profile from './Pages/User/Profile'
 import React from 'react'
 import MyEvent from './Pages/User/MyEvents'
 import Traking from './Pages/User/Traking'
-
+import UserManagement from './Pages/admin/UserManagement'
+import TemplateManagement from './Pages/admin/TemplateManagement'
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/mis-eventos" element={<MyEvent />} />
         <Route path="/traking" element={<Traking />} />
+        <Route path="/user-management" element={<UserManagement />} />
+        <Route path="/template-management" element={<TemplateManagement />} />
         {/* otras rutas  */}
       </Routes>
       <Footer />
