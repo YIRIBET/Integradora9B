@@ -17,14 +17,14 @@ function Login() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error('Login failed')
         return res.json()
       })
-      .then(data => {
+      .then((data) => {
         // Guardar el token si lo recibes
         localStorage.setItem('token', data.token)
-        
+
         // Mostrar alerta de éxito
         Swal.fire({
           title: '¡Bienvenido!',
@@ -37,14 +37,14 @@ function Login() {
           navigate('/home')
         })
       })
-      .catch(err => {
+      .catch((err) => {
         // Mostrar alerta de error
         Swal.fire({
           title: 'Error',
           text: 'Correo o contraseña incorrectos',
           icon: 'error',
           confirmButtonText: 'Entendido',
-          confirmButtonColor: '#ec4899'
+          confirmButtonColor: '#ec4899',
         })
         console.error(err)
       })
@@ -88,7 +88,9 @@ function Login() {
           <button
             type="submit"
             disabled={isLoading} // Deshabilitar botón durante carga
-            className={`w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-full transition-all duration-300 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-full transition-all duration-300 ${
+              isLoading ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
           >
             {isLoading ? 'Cargando...' : 'Iniciar sesión'}
           </button>
@@ -96,7 +98,7 @@ function Login() {
         <p className="mt-6 text-center text-gray-500 text-sm">
           ¿No tienes una cuenta?{' '}
           <a
-            href="/register"
+            href="/registry"
             className="text-pink-500 hover:underline font-medium"
           >
             Regístrate aquí
