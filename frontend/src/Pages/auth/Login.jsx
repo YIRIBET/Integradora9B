@@ -25,17 +25,36 @@ function Login() {
         // Guardar el token si lo recibes
         localStorage.setItem('token', data.token)
 
-        // Mostrar alerta de éxito
-        Swal.fire({
-          title: '¡Bienvenido!',
-          text: 'Has iniciado sesión correctamente',
-          icon: 'success',
-          confirmButtonText: 'Continuar',
-          confirmButtonColor: '#ec4899', // Color rosa para coincidir con tu diseño
-          timer: 2000,
-        }).then(() => {
+        // Decodificar el token JWT para obtener el role
+        const tokenParts = data.token.split('.')
+        if (tokenParts.length === 3) {
+          try {
+            const payload = JSON.parse(atob(tokenParts[1]))
+            const role = payload.role
+
+            // Mostrar alerta de éxito
+            Swal.fire({
+              title: '¡Bienvenido!',
+              text: 'Has iniciado sesión correctamente',
+              icon: 'success',
+              confirmButtonText: 'Continuar',
+              confirmButtonColor: '#ec4899',
+              timer: 2000,
+            }).then(() => {
+              if (role === 'admin') {
+                navigate('/admin/home')
+              } else {
+                navigate('/home')
+              }
+            })
+          } catch (err) {
+            // Si falla la decodificación, ir a /home por defecto
+            navigate('/home')
+          }
+        } else {
+          // Si el token no tiene el formato esperado, ir a /home por defecto
           navigate('/home')
-        })
+        }
       })
       .catch((err) => {
         // Mostrar alerta de error
