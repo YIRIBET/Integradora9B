@@ -23,7 +23,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/registry" element={<Registry />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/templates" element={<Templates />} />
+        <Route path="/templates/:id" element={<Templates />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/mis-eventos" element={<MyEvent />} />
         <Route path="/traking" element={<Traking />} />
