@@ -1,5 +1,5 @@
 import './App.css'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './Components/Navbar'
 import LandingPage from './Components/LandingPage'
 import Footer from './Components/Footer'
@@ -14,25 +14,115 @@ import TemplateManagement from './Pages/admin/TemplateManagement'
 import Home from './Pages/user/Home'
 import AdminHome from './Pages/admin/Home'
 
+// Componente para obtener el role desde el token
+function getRoleFromToken() {
+  const token = localStorage.getItem('token')
+  if (!token) return null
+  const parts = token.split('.')
+  if (parts.length !== 3) return null
+  try {
+    const payload = JSON.parse(atob(parts[1]))
+    return payload.role
+  } catch {
+    return null
+  }
+}
+
+// Ruta privada para usuarios con role "user"
+function PrivateRoute({ children }) {
+  const role = getRoleFromToken()
+  if (role === 'user') {
+    return children
+  }
+  return <Navigate to="/login" replace />
+}
+
+// Ruta privada para admin
+function AdminRoute({ children }) {
+  const role = getRoleFromToken()
+  if (role === 'admin') {
+    return children
+  }
+  return <Navigate to="/login" replace />
+}
+
 function App() {
   return (
     <>
       <Navbar />
       <Routes>
+        {/* Rutas públicas */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registry" element={<Registry />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/templates/:id" element={<Templates />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/mis-eventos" element={<MyEvent />} />
-        <Route path="/traking" element={<Traking />} />
-        <Route path="/admin/user-management" element={<UserManagement />} />
+
+        {/* Rutas privadas para usuario */}
+        <Route
+          path="/home"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/templates/:id"
+          element={
+            <PrivateRoute>
+              <Templates />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/mis-eventos"
+          element={
+            <PrivateRoute>
+              <MyEvent />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/traking"
+          element={
+            <PrivateRoute>
+              <Traking />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Rutas privadas para admin */}
+        <Route
+          path="/admin/user-management"
+          element={
+            <AdminRoute>
+              <UserManagement />
+            </AdminRoute>
+          }
+        />
         <Route
           path="/admin/template-management"
-          element={<TemplateManagement />}
+          element={
+            <AdminRoute>
+              <TemplateManagement />
+            </AdminRoute>
+          }
         />
-        <Route path="/admin/home" element={<AdminHome />} />
+        <Route
+          path="/admin/home"
+          element={
+            <AdminRoute>
+              <AdminHome />
+            </AdminRoute>
+          }
+        />
         {/* otras rutas  */}
       </Routes>
       <Footer />
