@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+// Importa SweetAlert
+import Swal from 'sweetalert2'
 
-const UserRegisterModal = ({ open, onClose, onUserCreated }) => {
+const UserRegisterModal = ({ open, onClose, onUserSaved, user }) => {
   const [form, setForm] = useState({
     nombre: '',
     apellido: '',
@@ -10,21 +12,71 @@ const UserRegisterModal = ({ open, onClose, onUserCreated }) => {
   })
   const [isLoading, setIsLoading] = useState(false)
 
+  useEffect(() => {
+    if (user) {
+      setForm({
+        nombre: user.nombre || '',
+        apellido: user.apellido || '',
+        email: user.email || '',
+        password: '',
+        role: user.role || 'user',
+      })
+    } else {
+      setForm({
+        nombre: '',
+        apellido: '',
+        email: '',
+        password: '',
+        role: 'user',
+      })
+    }
+  }, [user, open])
+
   if (!open) return null
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleRegister = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    // Confirmación con SweetAlert
+    const result = await Swal.fire({
+      title: user ? '¿Guardar cambios?' : '¿Registrar usuario?',
+      text: user
+        ? '¿Estás seguro de que deseas guardar los cambios de este usuario?'
+        : '¿Estás seguro de que deseas registrar este usuario?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#ec4899',
+      cancelButtonColor: '#aaa',
+      confirmButtonText: user ? 'Guardar' : 'Registrar',
+      cancelButtonText: 'Cancelar',
+    })
+    if (!result.isConfirmed) return
+
     setIsLoading(true)
     try {
-      const response = await fetch('http://localhost:3000/api/users/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
+      let response
+      if (user) {
+        // Edición SIN enviar password
+        const { password, email, role, ...formWithoutPassword } = form
+        response = await fetch(
+          `http://localhost:3000/api/users/${user.id_user}`,
+          {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formWithoutPassword),
+          }
+        )
+      } else {
+        // Registro
+        response = await fetch('http://localhost:3000/api/users/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        })
+      }
       if (response.ok) {
         setForm({
           nombre: '',
@@ -33,27 +85,41 @@ const UserRegisterModal = ({ open, onClose, onUserCreated }) => {
           password: '',
           role: 'user',
         })
-        if (onUserCreated) onUserCreated()
+        if (onUserSaved)
+          onUserSaved(
+            user
+              ? 'Usuario actualizado correctamente'
+              : 'Usuario registrado correctamente'
+          )
       } else {
         const data = await response.json()
-        let errorMessage = data.message || 'Error al registrar usuario'
+        let errorMessage = data.message || 'Error al guardar usuario'
         if (
           data.error?.includes('duplicate key error') ||
           data.error?.includes('E11000')
         ) {
           errorMessage = 'El correo electrónico ya está registrado'
         }
-        alert(errorMessage)
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMessage,
+          confirmButtonColor: '#ec4899',
+        })
       }
     } catch (error) {
-      alert('Error de red o servidor')
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error de red o servidor',
+        confirmButtonColor: '#ec4899',
+      })
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm backdrop-contrast-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm backdrop-contrast-50 ">
       <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-8 relative border border-pink-200">
         <button
           className="absolute top-3 right-3 text-pink-400 hover:text-pink-600 text-2xl font-bold"
@@ -63,9 +129,9 @@ const UserRegisterModal = ({ open, onClose, onUserCreated }) => {
           ×
         </button>
         <h2 className="text-2xl font-bold text-pink-500 text-center mb-4">
-          Crear usuario
+          {user ? 'Editar usuario' : 'Crear usuario'}
         </h2>
-        <form onSubmit={handleRegister} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-gray-700">Nombre</label>
@@ -102,21 +168,25 @@ const UserRegisterModal = ({ open, onClose, onUserCreated }) => {
               value={form.email}
               onChange={handleChange}
               placeholder="correo@example.com"
+              disabled={!!user}
             />
           </div>
-          <div>
-            <label className="block text-gray-700">Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              required
-              minLength="6"
-              className="w-full mt-1 px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Mínimo 6 caracteres"
-            />
-          </div>
+          {/* Solo mostrar contraseña si es registro */}
+          {!user && (
+            <div>
+              <label className="block text-gray-700">Contraseña</label>
+              <input
+                type="password"
+                name="password"
+                required
+                minLength="6"
+                className="w-full mt-1 px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Mínimo 6 caracteres"
+              />
+            </div>
+          )}
           <div>
             <label className="block text-gray-700">Rol</label>
             <select
@@ -124,6 +194,7 @@ const UserRegisterModal = ({ open, onClose, onUserCreated }) => {
               className="w-full mt-1 px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
               value={form.role}
               onChange={handleChange}
+              disabled={!!user}
             >
               <option value="user">Usuario</option>
               <option value="admin">Administrador</option>
@@ -169,6 +240,8 @@ const UserRegisterModal = ({ open, onClose, onUserCreated }) => {
                   </svg>
                   Procesando...
                 </>
+              ) : user ? (
+                'Guardar cambios'
               ) : (
                 'Registrar'
               )}
