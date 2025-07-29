@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import {
+  MagnifyingGlassIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline'
+// Importa el modal de registro
+import UserRegisterModal from '../../Components/admin/UserRegisterModal'
 
 const UserManagement = () => {
   const [users, setUsers] = useState([])
+  const [search, setSearch] = useState('')
+  const [showModal, setShowModal] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     // Fetch users from the API
@@ -10,63 +20,141 @@ const UserManagement = () => {
       .get('http://localhost:3000/api/users/')
       .then((response) => {
         setUsers(response.data.data) // Adapt to the API response structure
+        console.log('Usuarios obtenidos:', response.data.data)
       })
       .catch((error) => {
         console.error('Error fetching users:', error)
       })
   }, [])
 
+  // Filtrado simple por nombre, apellido o email
+  const filteredUsers = users.filter(
+    (user) =>
+      user.nombre.toLowerCase().includes(search.toLowerCase()) ||
+      user.apellido.toLowerCase().includes(search.toLowerCase()) ||
+      user.email.toLowerCase().includes(search.toLowerCase())
+  )
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">
-        Users Management
-      </h1>
-      <p className="mb-6 text-gray-600">
-        Manage user accounts and monitor platform usage.
-      </p>
-      <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded mb-6 shadow-md">
-        Add User
-      </button>
-      <div className="bg-white border rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-semibold mb-6 text-gray-800">All Users</h2>
-        <input
-          type="text"
-          placeholder="Search users..."
-          className="border border-gray-300 p-3 rounded w-full mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+    <div className="p-6 bg-gradient-to-br from-pink-50 via-blue-50 to-white min-h-screen">
+      {/* Encabezado */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-pink-500 mb-1">Usuarios</h1>
+          <p className="text-blue-500">
+            Administra las cuentas y permisos de los usuarios.
+          </p>
+        </div>
+        <button
+          className="bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600 text-white px-6 py-2 rounded shadow-md font-semibold transition"
+          onClick={() => setShowModal(true)}
+        >
+          + Agregar usuario
+        </button>
+      </div>
+
+      {/* Modal de registro */}
+      <UserRegisterModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        onUserCreated={() => {
+          setShowModal(false)
+          // Refresca la lista de usuarios después de crear uno nuevo
+          axios.get('http://localhost:3000/api/users/').then((res) => {
+            setUsers(res.data.data)
+          })
+        }}
+      />
+
+      {/* Tabla */}
+      <div className="bg-white rounded-lg shadow-lg p-0 overflow-x-auto border border-pink-100">
+        {/* Barra superior de tabla */}
+        <div className="flex items-center justify-between px-6 py-4 rounded-t-lg bg-gradient-to-r from-pink-100 to-blue-100 border-b border-pink-200">
+          <div className="relative w-full">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-pink-400">
+              <MagnifyingGlassIcon className="w-5 h-5" />
+            </span>
+            <input
+              type="text"
+              placeholder="Buscar usuario..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border border-pink-200 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-pink-400 text-blue-800 pl-10 bg-pink-50 placeholder-pink-300"
+              style={{ minWidth: 220 }}
+            />
+          </div>
+        </div>
+        {/* Tabla */}
         <table className="w-full border-collapse">
           <thead>
-            <tr className="">
-              <th className="border p-4 text-left text-gray-600">User</th>
-              <th className="border p-4 text-left text-gray-600">Role</th>
-              <th className="border p-4 text-left text-gray-600">Status</th>
-              <th className="border p-4 text-left text-gray-600">Actions</th>
+            <tr className="bg-gradient-to-r from-pink-100 to-blue-100">
+              <th className="border-b border-pink-200 p-4 text-left text-pink-500 font-semibold">
+                Usuario
+              </th>
+              <th className="border-b border-pink-200 p-4 text-left text-pink-500 font-semibold">
+                Rol
+              </th>
+              <th className="border-b border-pink-200 p-4 text-left text-pink-500 font-semibold">
+                Estado
+              </th>
+              <th className="border-b border-pink-200 p-4 text-center text-pink-500 font-semibold">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id_user} className="hover:bg-gray-50">
-                <td className="border p-4 flex items-center">
-                  <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center mr-3">
+            {filteredUsers.length === 0 && (
+              <tr>
+                <td colSpan={4} className="text-center text-blue-300 py-8">
+                  No se encontraron usuarios.
+                </td>
+              </tr>
+            )}
+            {filteredUsers.map((user, idx) => (
+              <tr
+                key={user.id_user}
+                className={
+                  idx % 2 === 0
+                    ? 'bg-white'
+                    : 'bg-gradient-to-r from-pink-50 to-blue-50'
+                }
+              >
+                <td className="p-4 flex items-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-blue-500 text-white rounded-full flex items-center justify-center mr-3 text-lg font-bold uppercase shadow">
                     {user.nombre.charAt(0)}
                     {user.apellido.charAt(0)}
                   </div>
                   <div>
-                    <p className="text-gray-800 font-medium">{`${user.nombre} ${user.apellido}`}</p>
-                    <p className="text-gray-600 text-sm">{user.email}</p>
+                    <p className="text-blue-800 font-medium">{`${user.nombre} ${user.apellido}`}</p>
+                    <p className="text-pink-400 text-sm">{user.email}</p>
                   </div>
                 </td>
-                <td className="border p-4 text-gray-800">{user.role}</td>
-                <td className="border p-4">
+                <td className="p-4 text-blue-700">{user.role}</td>
+                <td className="p-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-white text-sm ${
-                      user.status === 1 ? 'bg-green-500' : 'bg-gray-400'
+                    className={`px-3 py-1 rounded-full text-white text-xs font-semibold ${
+                      user.status === 1
+                        ? 'bg-gradient-to-r from-pink-500 to-blue-500'
+                        : 'bg-gray-400'
                     }`}
                   >
-                    {user.status === 1 ? 'Active' : 'Inactive'}
+                    {user.status === 1 ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
-                <td className="border p-4 text-gray-800">...</td>
+                <td className="p-4 text-center">
+                  <button
+                    className="text-blue-500 hover:text-pink-500 mx-1 transition"
+                    title="Editar"
+                  >
+                    <PencilSquareIcon className="inline w-5 h-5" />
+                  </button>
+                  <button
+                    className="text-pink-500 hover:text-blue-500 mx-1 transition"
+                    title="Eliminar"
+                  >
+                    <TrashIcon className="inline w-5 h-5" />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
