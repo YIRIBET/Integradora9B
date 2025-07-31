@@ -17,34 +17,53 @@ function Login() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error('Login failed')
         return res.json()
       })
-      .then(data => {
+      .then((data) => {
         // Guardar el token si lo recibes
         localStorage.setItem('token', data.token)
-        
-        // Mostrar alerta de éxito
-        Swal.fire({
-          title: '¡Bienvenido!',
-          text: 'Has iniciado sesión correctamente',
-          icon: 'success',
-          confirmButtonText: 'Continuar',
-          confirmButtonColor: '#ec4899', // Color rosa para coincidir con tu diseño
-          timer: 2000,
-        }).then(() => {
+
+        // Decodificar el token JWT para obtener el role
+        const tokenParts = data.token.split('.')
+        if (tokenParts.length === 3) {
+          try {
+            const payload = JSON.parse(atob(tokenParts[1]))
+            const role = payload.role
+
+            // Mostrar alerta de éxito
+            Swal.fire({
+              title: '¡Bienvenido!',
+              text: 'Has iniciado sesión correctamente',
+              icon: 'success',
+              confirmButtonText: 'Continuar',
+              confirmButtonColor: '#ec4899',
+              timer: 2000,
+            }).then(() => {
+              if (role === 'admin') {
+                navigate('/admin/home')
+              } else {
+                navigate('/home')
+              }
+            })
+          } catch (err) {
+            // Si falla la decodificación, ir a /home por defecto
+            navigate('/home')
+          }
+        } else {
+          // Si el token no tiene el formato esperado, ir a /home por defecto
           navigate('/home')
-        })
+        }
       })
-      .catch(err => {
+      .catch((err) => {
         // Mostrar alerta de error
         Swal.fire({
           title: 'Error',
           text: 'Correo o contraseña incorrectos',
           icon: 'error',
           confirmButtonText: 'Entendido',
-          confirmButtonColor: '#ec4899'
+          confirmButtonColor: '#ec4899',
         })
         console.error(err)
       })
@@ -88,7 +107,9 @@ function Login() {
           <button
             type="submit"
             disabled={isLoading} // Deshabilitar botón durante carga
-            className={`w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-full transition-all duration-300 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`w-full bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-full transition-all duration-300 ${
+              isLoading ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
           >
             {isLoading ? 'Cargando...' : 'Iniciar sesión'}
           </button>
@@ -96,7 +117,7 @@ function Login() {
         <p className="mt-6 text-center text-gray-500 text-sm">
           ¿No tienes una cuenta?{' '}
           <a
-            href="/register"
+            href="/registry"
             className="text-pink-500 hover:underline font-medium"
           >
             Regístrate aquí
