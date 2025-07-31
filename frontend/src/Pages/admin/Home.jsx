@@ -10,6 +10,7 @@ import {
   BarElement,
   Title,
 } from 'chart.js'
+import axios from 'axios'
 
 ChartJS.register(
   ArcElement,
@@ -22,54 +23,54 @@ ChartJS.register(
 )
 
 function AdminHome() {
-  // Datos mock para el dashboard
   const [stats, setStats] = useState({
-    totalTemplates: 24,
-    totalUsers: 120,
-    totalEvents: 45,
-    totalInvitations: 320,
-    templatesByCategory: {
-      Boda: 8,
-      Cumpleaños: 6,
-      Graduaciones: 4,
-      Corporativo: 3,
-      Otros: 3,
-    },
-    templatesByMonth: {
-      Enero: 2,
-      Febrero: 3,
-      Marzo: 4,
-      Abril: 5,
-      Mayo: 6,
-      Junio: 4,
-    },
+    totalTemplates: 0,
+    totalUsers: 0,
+    totalEvents: 0,
+    totalInvitations: 0,
   })
 
-  // Configuración de la gráfica de pastel
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [templatesRes, usersRes, eventsRes, guestsRes] =
+          await Promise.all([
+            axios.get('http://localhost:3000/api/templates'),
+            axios.get('http://localhost:3000/api/users/'),
+          ])
+
+        setStats({
+          totalTemplates: templatesRes.data.data.length,
+          totalUsers: usersRes.data.data.length,
+          totalEvents: 0,
+          totalInvitations: 0,
+        })
+      } catch (error) {
+        // Puedes mostrar un error visual si lo deseas
+      }
+    }
+    fetchStats()
+  }, [])
+
+  // Para las gráficas, asume que todas las invitaciones fueron creadas en agosto
+  const totalEvents = stats.totalEvents
   const pieData = {
-    labels: Object.keys(stats.templatesByCategory),
+    labels: ['Agosto'],
     datasets: [
       {
-        data: Object.values(stats.templatesByCategory),
-        backgroundColor: [
-          '#ec4899',
-          '#fbbf24',
-          '#10b981',
-          '#3b82f6',
-          '#a78bfa',
-        ],
+        data: [totalEvents],
+        backgroundColor: ['#ec4899'],
         borderWidth: 1,
       },
     ],
   }
 
-  // Configuración de la gráfica de barras
   const barData = {
-    labels: Object.keys(stats.templatesByMonth),
+    labels: ['Agosto'],
     datasets: [
       {
-        label: 'Plantillas creadas',
-        data: Object.values(stats.templatesByMonth),
+        label: 'Eventos creados',
+        data: [0, 0, 0, 0, 0, 0, 0, totalEvents, 0, 0, 0, 0],
         backgroundColor: '#ec4899',
       },
     ],
@@ -112,13 +113,13 @@ function AdminHome() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4 text-pink-500">
-            Usos de Plantillas por Categoría
+            Eventos creados por categoría (Agosto)
           </h2>
           <Pie data={pieData} />
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4 text-pink-500">
-            Plantillas creadas por mes
+            Eventos creados por mes
           </h2>
           <Bar
             data={barData}
