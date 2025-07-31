@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from "react-router-dom";
+import Swal from 'sweetalert2'; // Importamos SweetAlert2
 
 function Templates() {
   const [templates, setTemplates] = useState([]);
@@ -10,7 +11,10 @@ function Templates() {
   const [texts, setTexts] = useState([]);
   const [images, setImages] = useState([]);
   const [draggingItem, setDraggingItem] = useState(null);
-  
+
+  const [addressPosition, setAddressPosition] = useState({ x: 30, y: 30 });
+  const [datePosition, setDatePosition] = useState({ x: 30, y: 60 });
+
   const [invitationData, setInvitationData] = useState({
     address: '',
     scheduled_at: '',
@@ -19,11 +23,11 @@ function Templates() {
   });
 
   const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState('');
-  const [errors, setErrors] = useState({});
+  // Eliminamos saveMessage y errors del estado si SweetAlert2 maneja todo
+  // const [saveMessage, setSaveMessage] = useState('');
+  const [errors, setErrors] = useState({}); // Mantenemos errors para validación de formulario
 
   useEffect(() => {
-    // Obtener user_id del localStorage
     const userData = localStorage.getItem('user');
     if (userData) {
       const user = JSON.parse(userData);
@@ -33,54 +37,43 @@ function Templates() {
       }));
     }
 
-    // Cargar plantilla
     fetch(`http://localhost:3000/api/templates/${id}/image`)
       .then((response) => {
-        if (!response.ok) throw new Error('Error al cargar plantilla');
+        if (!response.ok) {
+          // Lanzar error para que sea capturado por el catch
+          throw new Error('No se pudo cargar la plantilla. Intenta de nuevo más tarde.');
+        }
         return response.json();
       })
       .then((data) => {
         if (data.success) {
           setTemplates(Array.isArray(data.data) ? data.data : [data.data]);
+        } else {
+            // Manejar caso donde success es false pero no hubo error de red/servidor
+            Swal.fire('Error', data.message || 'No se encontró la plantilla.', 'error');
         }
       })
       .catch((error) => {
         console.error('Error al cargar las plantillas:', error);
-        setSaveMessage(`Error: ${error.message}`);
+        Swal.fire('Error', error.message || 'Ocurrió un error al cargar la plantilla.', 'error');
       });
   }, [id]);
 
   const validateForm = () => {
     const newErrors = {};
-    
-    // Validación de dirección
-    if (!invitationData.address || invitationData.address.trim() === '') {
-      newErrors.address = 'La dirección es requerida';
-    }
-    
-    // Validación de fecha
+    if (!invitationData.address?.trim()) newErrors.address = 'La dirección es requerida';
     if (!invitationData.scheduled_at) {
       newErrors.scheduled_at = 'La fecha y hora son requeridas';
-    } else {
-      const selectedDate = new Date(invitationData.scheduled_at);
-      const currentDate = new Date();
-      
-      if (selectedDate < currentDate) {
-        newErrors.scheduled_at = 'La fecha no puede ser en el pasado';
-      }
+    } else if (new Date(invitationData.scheduled_at) < new Date()) {
+      newErrors.scheduled_at = 'La fecha no puede ser en el pasado';
     }
-    
-    // Validación de usuario
-    if (!invitationData.user_id_user || invitationData.user_id_user === '') {
-      newErrors.user = 'Usuario no identificado';
-    }
-
+    if (!invitationData.user_id_user) newErrors.user = 'Usuario no identificado';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleAddText = () => {
-    if (newText.trim() === '') return;
+    if (!newText.trim()) return;
     setTexts([...texts, {
       value: newText,
       fontFamily,
@@ -147,6 +140,10 @@ function Templates() {
         y
       };
       setImages(newImages);
+    } else if (draggingItem.type === 'address') {
+      setAddressPosition({ x, y });
+    } else if (draggingItem.type === 'scheduled_at') {
+      setDatePosition({ x, y });
     }
   };
 
@@ -156,26 +153,27 @@ function Templates() {
       ...invitationData,
       [name]: name === 'templates_id_templates' ? parseInt(value) : value
     });
-    
+
+    // Limpiar error específico al cambiar el campo
     if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: null
-      });
+      setErrors({ ...errors, [name]: null });
     }
   };
 
   const saveInvitation = async () => {
+    // Si la validación falla, mostraremos las alertas para cada error
     if (!validateForm()) {
-      console.log('Errores de validación:', errors);
+      let errorMessages = Object.values(errors).filter(msg => msg !== null).join('<br>');
+      if (errorMessages) {
+          Swal.fire('Error de Validación', errorMessages, 'error');
+      }
       return;
     }
 
     setIsSaving(true);
-    setSaveMessage('');
+    // Ya no necesitamos setSaveMessage('') aquí, SweetAlert lo maneja
 
     try {
-      // Guardar diseño en localStorage
       const designData = {
         texts,
         images,
@@ -191,16 +189,12 @@ function Templates() {
       };
       localStorage.setItem('currentDesign', JSON.stringify(designData));
 
-      // Preparar datos para el servidor
       const payload = {
         address: invitationData.address,
         scheduled_at: new Date(invitationData.scheduled_at).toISOString(),
         templates_id_templates: invitationData.templates_id_templates,
         user_id_user: invitationData.user_id_user,
-       
       };
-
-      console.log('Enviando datos al servidor:', payload);
 
       const response = await fetch('http://localhost:3000/api/invitation/', {
         method: 'POST',
@@ -212,24 +206,20 @@ function Templates() {
       });
 
       const data = await response.json();
-      console.log('Respuesta del servidor:', data);
-
       if (!response.ok) {
+        // Lanzar error para que sea capturado por el catch
         throw new Error(data.message || 'Error al guardar la invitación');
       }
 
-      setSaveMessage('¡Invitación guardada correctamente!');
-      
-      // Resetear campos del formulario
+      Swal.fire('¡Éxito!', '¡Invitación guardada correctamente!', 'success');
       setInvitationData(prev => ({
         ...prev,
         address: '',
         scheduled_at: ''
       }));
-
     } catch (error) {
-      console.error('Error al guardar:', error);
-      setSaveMessage(`Error: ${error.message}`);
+      console.error('Error al guardar la invitación:', error);
+      Swal.fire('Error', error.message || 'Ocurrió un error inesperado al guardar la invitación.', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -238,7 +228,7 @@ function Templates() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Vista previa de la plantilla editable */}
+        {/* Vista previa editable */}
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">Vista previa de la invitación</h2>
           <div
@@ -254,7 +244,58 @@ function Templates() {
                 style={{ zIndex: 0 }}
               />
             )}
-            
+
+            {/* Dirección (arrastrable) */}
+            {invitationData.address && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: `${addressPosition.y}px`,
+                  left: `${addressPosition.x}px`,
+                  fontFamily,
+                  color: fontColor,
+                  fontSize: '20px',
+                  padding: '4px',
+                  zIndex: 3,
+                  userSelect: 'none',
+                  cursor: 'move'
+                }}
+                draggable
+                onDragStart={(e) => handleDragStart(e, -1, 'address')}
+                onDragEnd={handleDragEnd}
+              >
+                {invitationData.address}
+              </div>
+            )}
+
+            {/* Fecha y hora (arrastrable) */}
+            {invitationData.scheduled_at && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: `${datePosition.y}px`,
+                  left: `${datePosition.x}px`,
+                  fontFamily,
+                  color: fontColor,
+                  fontSize: '20px',
+                  backgroundColor: 'rgba(255,255,255,0.7)',
+                  padding: '4px',
+                  zIndex: 3,
+                  userSelect: 'none',
+                  cursor: 'move'
+                }}
+                draggable
+                onDragStart={(e) => handleDragStart(e, -2, 'scheduled_at')}
+                onDragEnd={handleDragEnd}
+              >
+                {new Date(invitationData.scheduled_at).toLocaleString('es-MX', {
+                  dateStyle: 'medium',
+                  timeStyle: 'short'
+                })}
+              </div>
+            )}
+
+            {/* Textos adicionales */}
             {texts.map((text, idx) => (
               <div
                 key={`text-${idx}`}
@@ -278,7 +319,8 @@ function Templates() {
                 {text.value}
               </div>
             ))}
-            
+
+            {/* Imágenes */}
             {images.map((img, idx) => (
               <img
                 key={`img-${idx}`}
@@ -322,7 +364,7 @@ function Templates() {
                     onChange={e => setNewText(e.target.value)}
                   />
                   <button
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
                     onClick={handleAddText}
                   >
                     Agregar
@@ -422,7 +464,7 @@ function Templates() {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <button
               className={`w-full px-4 py-3 rounded-lg font-medium text-white transition-colors ${
-                isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
+                isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-pink-600 hover:bg-pink-700'
               }`}
               onClick={saveInvitation}
               disabled={isSaving}
@@ -437,15 +479,6 @@ function Templates() {
                 </span>
               ) : 'Guardar Invitación'}
             </button>
-            
-            
-            {saveMessage && (
-              <div className={`mt-4 p-3 rounded-lg text-sm ${
-                saveMessage.includes('Error') ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-              }`}>
-                {saveMessage}
-              </div>
-            )}
           </div>
         </div>
       </div>
