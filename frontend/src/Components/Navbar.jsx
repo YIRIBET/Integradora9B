@@ -117,14 +117,6 @@ const Navbar = () => {
                     Mis Eventos
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/traking"
-                    className="block py-3 px-4 text-gray-500 rounded hover:bg-gray-100 md:hover:bg-gray-100/10 md:hover:text-pink-700 md:p-2 dark:text-white md:dark:hover:text-pink-500 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    Seguimiento
-                  </Link>
-                </li>
 
                 <li>
                   <Link
