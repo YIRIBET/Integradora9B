@@ -90,7 +90,7 @@ function App() {
           }
         />
         <Route
-          path="/traking"
+          path="/traking/:invitationId"
           element={
             <PrivateRoute>
               <Traking />
