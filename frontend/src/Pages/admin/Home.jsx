@@ -29,15 +29,33 @@ function AdminHome() {
     totalEvents: 0,
     totalInvitations: 0,
   })
+  const [categoryStats, setCategoryStats] = useState({
+    labels: [],
+    datasets: [{ data: [] }],
+  })
+  const [monthStats, setMonthStats] = useState({
+    labels: [],
+    datasets: [{ data: [] }],
+  })
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [templatesRes, usersRes, eventsRes, guestsRes] =
-          await Promise.all([
-            axios.get('http://localhost:3000/api/templates'),
-            axios.get('http://localhost:3000/api/users/'),
-          ])
+        const [
+          templatesRes,
+          usersRes,
+          eventsRes,
+          guestsRes,
+          templatesStatsRes,
+          createdByMonthRes,
+        ] = await Promise.all([
+          axios.get('http://localhost:3000/api/templates'),
+          axios.get('http://localhost:3000/api/users/'),
+          0,
+          0,
+          axios.get('http://localhost:3000/api/templates/templates-stats'),
+          axios.get('http://localhost:3000/api/templates/created-by-month'),
+        ])
 
         setStats({
           totalTemplates: templatesRes.data.data.length,
@@ -45,6 +63,53 @@ function AdminHome() {
           totalEvents: 0,
           totalInvitations: 0,
         })
+
+        if (
+          templatesStatsRes.data &&
+          templatesStatsRes.data.data &&
+          Array.isArray(templatesStatsRes.data.data.labels)
+        ) {
+          setCategoryStats({
+            labels: templatesStatsRes.data.data.labels,
+            datasets: [
+              {
+                data: templatesStatsRes.data.data.datasets[0].data,
+                backgroundColor: [
+                  '#ec4899',
+                  '#fbbf24',
+                  '#10b981',
+                  '#3b82f6',
+                  '#a78bfa',
+                  '#6366f1',
+                  '#f472b6',
+                  '#60a5fa',
+                  '#f87171',
+                  '#34d399',
+                  '#facc15',
+                  '#a3e635',
+                ],
+                borderWidth: 1,
+              },
+            ],
+          })
+        }
+
+        if (
+          createdByMonthRes.data &&
+          createdByMonthRes.data.data &&
+          Array.isArray(createdByMonthRes.data.data.labels)
+        ) {
+          setMonthStats({
+            labels: createdByMonthRes.data.data.labels,
+            datasets: [
+              {
+                label: createdByMonthRes.data.data.datasets[0].label,
+                data: createdByMonthRes.data.data.datasets[0].data,
+                backgroundColor: '#ec4899',
+              },
+            ],
+          })
+        }
       } catch (error) {
         // Puedes mostrar un error visual si lo deseas
       }
@@ -54,26 +119,51 @@ function AdminHome() {
 
   // Para las gráficas, asume que todas las invitaciones fueron creadas en agosto
   const totalEvents = stats.totalEvents
+
+  // Pie chart: eventos creados por categoría (de la API)
   const pieData = {
-    labels: ['Agosto'],
-    datasets: [
-      {
-        data: [totalEvents],
-        backgroundColor: ['#ec4899'],
-        borderWidth: 1,
-      },
-    ],
+    labels: categoryStats.labels.length > 0 ? categoryStats.labels : ['Agosto'],
+    datasets:
+      categoryStats.datasets[0].data.length > 0
+        ? categoryStats.datasets
+        : [
+            {
+              data: [stats.totalEvents],
+              backgroundColor: ['#ec4899'],
+              borderWidth: 1,
+            },
+          ],
   }
 
+  // Bar chart: eventos creados por mes (de la API)
   const barData = {
-    labels: ['Agosto'],
-    datasets: [
-      {
-        label: 'Eventos creados',
-        data: [0, 0, 0, 0, 0, 0, 0, totalEvents, 0, 0, 0, 0],
-        backgroundColor: '#ec4899',
-      },
-    ],
+    labels:
+      monthStats.labels.length > 0
+        ? monthStats.labels
+        : [
+            'Enero',
+            'Febrero',
+            'Marzo',
+            'Abril',
+            'Mayo',
+            'Junio',
+            'Julio',
+            'Agosto',
+            'Septiembre',
+            'Octubre',
+            'Noviembre',
+            'Diciembre',
+          ],
+    datasets:
+      monthStats.datasets[0].data.length > 0
+        ? monthStats.datasets
+        : [
+            {
+              label: 'Eventos creados',
+              data: [0, 0, 0, 0, 0, 0, 0, stats.totalEvents, 0, 0, 0, 0],
+              backgroundColor: '#ec4899',
+            },
+          ],
   }
 
   return (
@@ -113,7 +203,7 @@ function AdminHome() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4 text-pink-500">
-            Eventos creados por categoría (Agosto)
+            Eventos creados por categoría
           </h2>
           <Pie data={pieData} />
         </div>
