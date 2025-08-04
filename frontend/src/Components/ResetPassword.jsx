@@ -31,7 +31,7 @@ const ResetPassword = () => {
                 });
                 setPassword("");
                 // Opcional: redirigir después de éxito
-                // window.location.href = "/login";
+                 window.location.href = "/login";
             } else {
                 Swal.fire({
                     icon: "error",
