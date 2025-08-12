@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
+import { AuthContext } from '../Context/AuthContext'
 
 // Función para obtener el role del token
 function getRoleFromToken() {
@@ -17,7 +18,7 @@ function getRoleFromToken() {
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const role = getRoleFromToken()
+  const { role } = useContext(AuthContext)
 
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900">
@@ -141,7 +142,7 @@ const Navbar = () => {
                     to="/admin/home"
                     className="block py-3 px-4 text-gray-500 rounded hover:bg-gray-100 md:hover:bg-gray-100/10 md:hover:text-pink-700 md:p-2 dark:text-white md:dark:hover:text-pink-500 dark:hover:bg-gray-700 dark:hover:text-white"
                   >
-                    Panel Admin
+                    Estadisticas
                   </Link>
                 </li>
                 <li>
@@ -157,12 +158,12 @@ const Navbar = () => {
                     to="/admin/template-management"
                     className="block py-3 px-4 text-gray-500 rounded hover:bg-gray-100 md:hover:bg-gray-100/10 md:hover:text-pink-700 md:p-2 dark:text-white md:dark:hover:text-pink-500 dark:hover:bg-gray-700 dark:hover:text-white"
                   >
-                    Plantillas Admin
+                    Plantillas
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="/profile"
+                    to="/admin/profile"
                     className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                   >
                     <span className="sr-only">Open user menu</span>

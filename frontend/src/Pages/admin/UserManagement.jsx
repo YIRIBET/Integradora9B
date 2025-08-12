@@ -30,13 +30,19 @@ const UserManagement = () => {
       })
   }, [])
 
+  console.log('Usuarios:', users)
+
   // Filtrado simple por nombre, apellido o email
-  const filteredUsers = users.filter(
-    (user) =>
-      user.nombre.toLowerCase().includes(search.toLowerCase()) ||
-      user.apellido.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredUsers = users.filter((user) => {
+    const nombre = user.nombre ? user.nombre : 'vacio'
+    const apellido = user.apellido ? user.apellido : 'vacio'
+    const email = user.email ? user.email : 'vacio'
+    return (
+      nombre.toLowerCase().includes(search.toLowerCase()) ||
+      apellido.toLowerCase().includes(search.toLowerCase()) ||
+      email.toLowerCase().includes(search.toLowerCase())
+    )
+  })
 
   // Handler para abrir modal en modo edición
   const handleEdit = (user) => {
@@ -186,15 +192,21 @@ const UserManagement = () => {
               >
                 <td className="p-4 flex items-center">
                   <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-blue-500 text-white rounded-full flex items-center justify-center mr-3 text-lg font-bold uppercase shadow">
-                    {user.nombre.charAt(0)}
-                    {user.apellido.charAt(0)}
+                    {(user.nombre ? user.nombre.charAt(0) : 'V') +
+                      (user.apellido ? user.apellido.charAt(0) : 'A')}
                   </div>
                   <div>
-                    <p className="text-blue-800 font-medium">{`${user.nombre} ${user.apellido}`}</p>
-                    <p className="text-pink-400 text-sm">{user.email}</p>
+                    <p className="text-blue-800 font-medium">{`${
+                      user.nombre ? user.nombre : 'vacio'
+                    } ${user.apellido ? user.apellido : 'vacio'}`}</p>
+                    <p className="text-pink-400 text-sm">
+                      {user.email ? user.email : 'vacio'}
+                    </p>
                   </div>
                 </td>
-                <td className="p-4 text-blue-700">{user.role}</td>
+                <td className="p-4 text-blue-700">
+                  {user.role ? user.role : 'vacio'}
+                </td>
                 <td className="p-4">
                   <span
                     className={`px-3 py-1 rounded-full text-white text-xs font-semibold ${

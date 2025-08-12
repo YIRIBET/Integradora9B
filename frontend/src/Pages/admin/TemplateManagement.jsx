@@ -55,11 +55,11 @@ const TemplateManagement = () => {
     const result = await Swal.fire({
       title:
         template.status === 1
-          ? '¿Desactivar plantilla?'
+          ? '¿Eliminar plantilla?'
           : '¿Activar plantilla?',
       text:
         template.status === 1
-          ? `¿Seguro que deseas desactivar "${template.template_name}"?`
+          ? `¿Seguro que deseas eliminar "${template.template_name}"?`
           : `¿Seguro que deseas activar "${template.template_name}"?`,
       icon: 'warning',
       showCancelButton: true,

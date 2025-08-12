@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2' // Importar SweetAlert
+import { AuthContext } from '../../Context/AuthContext'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false) // Estado para manejar carga
   const navigate = useNavigate()
+  const { login } = useContext(AuthContext)
 
   const handleLogin = (e) => {
     e.preventDefault()
@@ -24,6 +26,7 @@ function Login() {
       .then((data) => {
         // Guardar el token si lo recibes
         localStorage.setItem('token', data.token)
+        login(data.token) // Actualiza el contexto
 
         // Decodificar el token JWT para obtener el role
         const tokenParts = data.token.split('.')
@@ -31,6 +34,9 @@ function Login() {
           try {
             const payload = JSON.parse(atob(tokenParts[1]))
             const role = payload.role
+            //Obten el id y guardalo en el localstorage
+            const userId = payload.id_user
+            localStorage.setItem('userId', userId)
 
             // Mostrar alerta de éxito
             Swal.fire({

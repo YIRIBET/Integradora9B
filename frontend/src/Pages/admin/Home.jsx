@@ -51,8 +51,8 @@ function AdminHome() {
         ] = await Promise.all([
           axios.get('http://localhost:3000/api/templates'),
           axios.get('http://localhost:3000/api/users/'),
-          0,
-          0,
+          axios.get('http://localhost:3000/api/invitation/'),
+          axios.get('http://localhost:3000/api/guest/'),
           axios.get('http://localhost:3000/api/templates/templates-stats'),
           axios.get('http://localhost:3000/api/templates/created-by-month'),
         ])
@@ -60,8 +60,8 @@ function AdminHome() {
         setStats({
           totalTemplates: templatesRes.data.data.length,
           totalUsers: usersRes.data.data.length,
-          totalEvents: 0,
-          totalInvitations: 0,
+          totalEvents: eventsRes.data.data.length,
+          totalInvitations: guestsRes.data.data.length,
         })
 
         if (
