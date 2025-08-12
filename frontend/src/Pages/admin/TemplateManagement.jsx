@@ -94,9 +94,10 @@ const TemplateManagement = () => {
   }
 
   // Filtrado simple por nombre
-  const filteredTemplates = templates.filter((t) =>
-    t.template_name?.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredTemplates = templates.filter((t) => {
+    const name = t.template_name ? t.template_name : "vacio"
+    return name.toLowerCase().includes(search.toLowerCase())
+  })
 
   return (
     <div className="p-6 bg-gradient-to-br from-pink-50 via-blue-50 to-white min-h-screen">
@@ -181,15 +182,15 @@ const TemplateManagement = () => {
                   {template.image ? (
                     <img
                       src={template.image}
-                      alt={template.template_name}
+                      alt={template.template_name ? template.template_name : "vacio"}
                       className="w-16 h-16 object-cover rounded shadow"
                     />
                   ) : (
-                    <span className="text-gray-400">Sin imagen</span>
+                    <span className="text-gray-400">vacio</span>
                   )}
                 </td>
                 <td className="p-4 text-blue-800 font-medium">
-                  {template.template_name}
+                  {template.template_name ? template.template_name : "vacio"}
                 </td>
                 <td className="p-4">
                   <span
@@ -199,7 +200,7 @@ const TemplateManagement = () => {
                         : 'bg-gray-400'
                     }`}
                   >
-                    {template.status === 1 ? 'Activo' : 'Inactivo'}
+                    {template.status === 1 ? 'Activo' : (template.status === 0 ? 'Inactivo' : 'vacio')}
                   </span>
                 </td>
                 <td className="p-4 text-center">
