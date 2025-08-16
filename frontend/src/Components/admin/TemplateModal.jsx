@@ -9,6 +9,20 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
   })
   const [preview, setPreview] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [eventTypes, setEventTypes] = useState([])
+  const [selectedEventType, setSelectedEventType] = useState('')
+  const [showEventTypeModal, setShowEventTypeModal] = useState(false)
+  const [newEventTypeName, setNewEventTypeName] = useState('')
+
+  useEffect(() => {
+    // Obtener tipos de evento
+    fetch('http://localhost:3000/api/eventType/')
+      .then((res) => res.json())
+      .then((data) => {
+        setEventTypes(data.data || [])
+      })
+      .catch(() => setEventTypes([]))
+  }, [showEventTypeModal, open])
 
   useEffect(() => {
     if (template) {
@@ -18,6 +32,7 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
         status: template.status ?? 1,
       })
       setPreview(template.image || null)
+      setSelectedEventType(template.id_event_type || '')
     } else {
       setForm({
         template_name: '',
@@ -25,6 +40,7 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
         status: 1,
       })
       setPreview(null)
+      setSelectedEventType('')
     }
   }, [template, open])
 
@@ -37,6 +53,44 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
       setPreview(files[0] ? URL.createObjectURL(files[0]) : null)
     } else {
       setForm({ ...form, [name]: value })
+    }
+  }
+
+  const handleEventTypeAdd = async (e) => {
+    e.preventDefault()
+    if (!newEventTypeName.trim()) return
+    setShowEventTypeModal(false)
+    try {
+      const res = await fetch('http://localhost:3000/api/eventType/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newEventTypeName }),
+      })
+      if (res.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Tipo de evento agregado',
+          confirmButtonColor: '#ec4899',
+          timer: 1500,
+        })
+        setNewEventTypeName('')
+        // Refresca tipos de evento
+        fetch('http://localhost:3000/api/eventType/')
+          .then((res) => res.json())
+          .then((data) => setEventTypes(data.data || []))
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al agregar tipo de evento',
+          confirmButtonColor: '#ec4899',
+        })
+      }
+    } catch {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de red o servidor',
+        confirmButtonColor: '#ec4899',
+      })
     }
   }
 
@@ -62,6 +116,7 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
       formData.append('template_name', form.template_name)
       if (form.image) formData.append('image', form.image)
       formData.append('status', form.status)
+      formData.append('id_event_type', selectedEventType)
       let response
       if (template) {
         response = await fetch(
@@ -129,6 +184,47 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
               onChange={handleChange}
               placeholder="Nombre"
             />
+          </div>
+          <div className="flex gap-2 items-end">
+            <div className="w-full">
+              <label className="block text-gray-700">Tipo de evento</label>
+              <select
+                name="id_event_type"
+                required
+                className="w-full mt-1 px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+                value={selectedEventType}
+                onChange={(e) => setSelectedEventType(e.target.value)}
+              >
+                <option value="">Selecciona un tipo de evento</option>
+                {eventTypes.map((ev) => (
+                  <option key={ev.id_event_type} value={ev.id_event_type}>
+                    {ev.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              type="button"
+              className="bg-pink-500 hover:bg-pink-600 text-white rounded-full p-2 flex items-center justify-center"
+              style={{ height: '40px', width: '40px' }}
+              onClick={() => setShowEventTypeModal(true)}
+              title="Agregar tipo de evento"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </button>
           </div>
           <div>
             <label className="block text-gray-700">Imagen</label>
@@ -207,6 +303,53 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
             </button>
           </div>
         </form>
+        {/* Modal para agregar tipo de evento */}
+        {showEventTypeModal && (
+          <div className="fixed inset-0 z-60 flex items-center justify-center backdrop-blur-sm backdrop-contrast-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 relative border border-pink-200">
+              <button
+                className="absolute top-3 right-3 text-pink-400 hover:text-pink-600 text-2xl font-bold"
+                onClick={() => setShowEventTypeModal(false)}
+                aria-label="Cerrar"
+              >
+                ×
+              </button>
+              <h2 className="text-xl font-bold text-pink-500 text-center mb-4">
+                Agregar tipo de evento
+              </h2>
+              <form onSubmit={handleEventTypeAdd} className="space-y-4">
+                <div>
+                  <label className="block text-gray-700">
+                    Nombre del evento
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full mt-1 px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+                    value={newEventTypeName}
+                    onChange={(e) => setNewEventTypeName(e.target.value)}
+                    placeholder="Ejemplo: Boda, Cumpleaños..."
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    className="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-full transition-all duration-300"
+                    onClick={() => setShowEventTypeModal(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="w-1/2 bg-pink-500 hover:bg-pink-600 text-white py-2 rounded-full transition-all duration-300"
+                  >
+                    Agregar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
