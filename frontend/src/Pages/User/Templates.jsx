@@ -1,257 +1,195 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
-import GuestModal from '../../Components/user/GuestModal' // Nuevo componente separado
-import { useNavigate } from 'react-router-dom'
+import GuestModal from '../../Components/user/GuestModal' 
+import { toPng } from 'html-to-image';
+
 
 function Templates() {
-  const [templates, setTemplates] = useState([])
-  const { id } = useParams()
-  const [newText, setNewText] = useState('')
-  const [fontFamily, setFontFamily] = useState('Arial')
-  const [fontColor, setFontColor] = useState('#000000')
-  const [texts, setTexts] = useState([])
-  const [images, setImages] = useState([])
-  const [draggingItem, setDraggingItem] = useState(null)
-  const previewRef = useRef(null)
-  const [addressPosition, setAddressPosition] = useState({ x: 30, y: 30 })
-  const [datePosition, setDatePosition] = useState({ x: 30, y: 60 })
+  const [templates, setTemplates] = useState([]);
+  const { id } = useParams();
+  const [newText, setNewText] = useState('');
+  const [fontFamily, setFontFamily] = useState('Arial');
+  const [fontColor, setFontColor] = useState('#000000');
+  const [texts, setTexts] = useState([]);
+  const [images, setImages] = useState([]);
+  const [draggingItem, setDraggingItem] = useState(null);
+  const previewRef = useRef(null);
+  const [addressPosition, setAddressPosition] = useState({ x: 30, y: 30 });
+  const [datePosition, setDatePosition] = useState({ x: 30, y: 60 });
 
   const [invitationData, setInvitationData] = useState({
     address: '',
     scheduled_at: '',
     templates_id_templates: parseInt(id) || 0,
-    user_id_user: 1,
-  })
+    user_id_user: localStorage.getItem('userId') ? parseInt(localStorage.getItem('userId')) : 0,
+});
 
-  const [isSaving, setIsSaving] = useState(false)
-  const [errors, setErrors] = useState({})
+  const [isSaving, setIsSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  // Nuevos estados para la funcionalidad de invitados
-  const [showGuestModal, setShowGuestModal] = useState(false)
-  const [guests, setGuests] = useState([])
-  const [invitationId, setInvitationId] = useState(null)
+  const [showGuestModal, setShowGuestModal] = useState(false);
+  const [guests, setGuests] = useState([]);
+  const [invitationId, setInvitationId] = useState(null);
 
   useEffect(() => {
-    const userData = localStorage.getItem('user')
+    const userData = localStorage.getItem('user');
     if (userData) {
-      const user = JSON.parse(userData)
+      const user = JSON.parse(userData);
       setInvitationData((prev) => ({
         ...prev,
         user_id_user: user.id_user || '',
-      }))
+      }));
     }
 
     fetch(`http://localhost:3000/api/templates/${id}/image`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(
-            'No se pudo cargar la plantilla. Intenta de nuevo más tarde.'
-          )
-        }
-        return response.json()
-      })
+      .then((res) => res.json())
       .then((data) => {
-        if (data.success) {
-          setTemplates(Array.isArray(data.data) ? data.data : [data.data])
-        } else {
-          Swal.fire(
-            'Error',
-            data.message || 'No se encontró la plantilla.',
-            'error'
-          )
-        }
+        if (data.success) setTemplates(Array.isArray(data.data) ? data.data : [data.data]);
+        else Swal.fire('Error', data.message || 'No se encontró la plantilla', 'error');
       })
-      .catch((error) => {
-        console.error('Error al cargar las plantillas:', error)
-        Swal.fire(
-          'Error',
-          error.message || 'Ocurrió un error al cargar la plantilla.',
-          'error'
-        )
-      })
-  }, [id])
+      .catch((err) => Swal.fire('Error', err.message || 'Ocurrió un error', 'error'));
+  }, [id]);
 
   const validateForm = () => {
-    const newErrors = {}
-    if (!invitationData.address?.trim())
-      newErrors.address = 'La dirección es requerida'
-    if (!invitationData.scheduled_at) {
-      newErrors.scheduled_at = 'La fecha y hora son requeridas'
-    } else if (new Date(invitationData.scheduled_at) < new Date()) {
-      newErrors.scheduled_at = 'La fecha no puede ser en el pasado'
-    }
-    if (!invitationData.user_id_user) newErrors.user = 'Usuario no identificado'
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    const newErrors = {};
+    if (!invitationData.address?.trim()) newErrors.address = 'La dirección es requerida';
+    if (!invitationData.scheduled_at) newErrors.scheduled_at = 'La fecha y hora son requeridas';
+    else if (new Date(invitationData.scheduled_at) < new Date()) newErrors.scheduled_at = 'La fecha no puede ser en el pasado';
+    if (!invitationData.user_id_user) newErrors.user = 'Usuario no identificado';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleAddText = () => {
-    if (!newText.trim()) return
+    if (!newText.trim()) return;
     setTexts([
       ...texts,
-      {
-        value: newText,
-        fontFamily,
-        color: fontColor,
-        x: 50,
-        y: 50,
-        type: 'text',
-      },
-    ])
-    setNewText('')
-  }
+      { value: newText, fontFamily, color: fontColor, x: 50, y: 50, type: 'text' },
+    ]);
+    setNewText('');
+  };
 
   const handleAddImage = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
         setImages([
           ...images,
-          {
-            src: reader.result,
-            x: 50,
-            y: 50,
-            width: 100,
-            height: 100,
-            type: 'image',
-          },
-        ])
-      }
-      reader.readAsDataURL(file)
+          { src: reader.result, x: 50, y: 50, width: 100, height: 100, type: 'image' },
+        ]);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleDragStart = (e, index, type) => {
-    setDraggingItem({ index, type })
-    e.dataTransfer.setData('text/plain', JSON.stringify({ index, type }))
-  }
-
-  const handleDragEnd = () => {
-    setDraggingItem(null)
-  }
-
-  const handleDragOver = (e) => {
-    e.preventDefault()
-  }
+    setDraggingItem({ index, type });
+    e.dataTransfer.setData('text/plain', JSON.stringify({ index, type }));
+  };
+  const handleDragEnd = () => setDraggingItem(null);
+  const handleDragOver = (e) => e.preventDefault();
 
   const handleDrop = (e) => {
-    e.preventDefault()
-    const containerRect = e.currentTarget.getBoundingClientRect()
-    const x = e.clientX - containerRect.left
-    const y = e.clientY - containerRect.top
+    e.preventDefault();
+    const containerRect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - containerRect.left;
+    const y = e.clientY - containerRect.top;
 
-    if (!draggingItem) return
+    if (!draggingItem) return;
 
     if (draggingItem.type === 'text') {
-      const newTexts = [...texts]
-      newTexts[draggingItem.index] = {
-        ...newTexts[draggingItem.index],
-        x,
-        y,
-      }
-      setTexts(newTexts)
+      const newTexts = [...texts];
+      newTexts[draggingItem.index] = { ...newTexts[draggingItem.index], x, y };
+      setTexts(newTexts);
     } else if (draggingItem.type === 'image') {
-      const newImages = [...images]
-      newImages[draggingItem.index] = {
-        ...newImages[draggingItem.index],
-        x,
-        y,
-      }
-      setImages(newImages)
-    } else if (draggingItem.type === 'address') {
-      setAddressPosition({ x, y })
-    } else if (draggingItem.type === 'scheduled_at') {
-      setDatePosition({ x, y })
-    }
-  }
+      const newImages = [...images];
+      newImages[draggingItem.index] = { ...newImages[draggingItem.index], x, y };
+      setImages(newImages);
+    } else if (draggingItem.type === 'address') setAddressPosition({ x, y });
+    else if (draggingItem.type === 'scheduled_at') setDatePosition({ x, y });
+  };
 
   const handleInvitationChange = (e) => {
-    const { name, value } = e.target
-    setInvitationData({
-      ...invitationData,
-      [name]: name === 'templates_id_templates' ? parseInt(value) : value,
-    })
+    const { name, value } = e.target;
+    setInvitationData({ ...invitationData, [name]: name === 'templates_id_templates' ? parseInt(value) : value });
+    if (errors[name]) setErrors({ ...errors, [name]: null });
+  };
 
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: null })
-    }
-  }
   const captureInvitationImage = async () => {
-    if (!previewRef.current) return null
-
+    if (!previewRef.current) return null;
     try {
-      const dataUrl = await toPng(previewRef.current, {
-        backgroundColor: '#ffffff',
-        quality: 1.0,
-        pixelRatio: 2, // Para mejor calidad en dispositivos HiDPI
-      })
-
-      return dataUrl // Esto es la imagen en base64
+      return await toPng(previewRef.current, { backgroundColor: '#ffffff', quality: 1.0, pixelRatio: 2 });
     } catch (error) {
-      console.error('Error al capturar la imagen:', error)
-      return null
+      console.error('Error al capturar la imagen:', error);
+      return null;
     }
-  }
+  };
+
+  const saveTempInvitation = async (previewRef, invitationId, userId) => {
+    if (!previewRef.current) return;
+    try {
+      const dataUrl = await captureInvitationImage();
+      if (!dataUrl) throw new Error('No se pudo capturar la imagen temporal');
+
+      const res = await fetch('http://localhost:3000/api/tempInvitation/save', {
+        method: 'POST',
+        body: (() => {
+          const formData = new FormData();
+          const byteString = atob(dataUrl.split(',')[1]);
+          const arrayBuffer = new ArrayBuffer(byteString.length);
+          const intArray = new Uint8Array(arrayBuffer);
+          for (let i = 0; i < byteString.length; i++) intArray[i] = byteString.charCodeAt(i);
+          const blob = new Blob([intArray], { type: 'image/png' });
+          formData.append('invitation_image', blob, 'invitation.png');
+          formData.append('user_id', userId);
+          formData.append('invitation_id', invitationId);
+          return formData;
+        })(),
+        headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Error al guardar imagen temporal');
+      return data.data;
+    } catch (err) {
+      console.error('Error al guardar imagen temporal:', err);
+    }
+  };
 
   const saveInvitation = async () => {
     if (!validateForm()) {
-      let errorMessages = Object.values(errors)
-        .filter((msg) => msg !== null)
-        .join('<br>')
-      if (errorMessages) {
-        Swal.fire('Error de Validación', errorMessages, 'error')
-      }
-      return
+      const msgs = Object.values(errors).filter((msg) => msg).join('<br>');
+      if (msgs) Swal.fire('Error de Validación', msgs, 'error');
+      return;
     }
 
-    setIsSaving(true)
-
+    setIsSaving(true);
     try {
-      // Capturar la imagen en base64
-      const invitationImage = await captureInvitationImage()
+      const invitationImage = await captureInvitationImage();
+      if (!invitationImage) throw new Error('No se pudo capturar la imagen');
 
-      const designData = {
-        texts,
-        images,
-        fontFamily,
-        fontColor,
-        templateId: id,
-        templateImage: templates[0]?.image,
-        invitationDetails: {
-          address: invitationData.address,
-          date: invitationData.scheduled_at,
-        },
-        lastSaved: new Date().toISOString(),
-        invitationImageBase64: invitationImage, // Agregamos la imagen en base64
-      }
-
-      localStorage.setItem('currentDesign', JSON.stringify(designData))
-
-      const payload = {
+      const invitationPayload = {
         address: invitationData.address,
         scheduled_at: new Date(invitationData.scheduled_at).toISOString(),
         templates_id_templates: invitationData.templates_id_templates,
         user_id_user: invitationData.user_id_user,
-        invitation_image: invitationImage, // Enviamos la imagen al servidor
-      }
+       
+      };
 
-      const response = await fetch('http://localhost:3000/api/invitation/', {
+      const res = await fetch('http://localhost:3000/api/invitation/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-        },
-        body: JSON.stringify(payload),
-      })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
+        body: JSON.stringify(invitationPayload),
+      });
 
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.message || 'Error al guardar la invitación')
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Error al guardar la invitación');
 
-      setInvitationId(data.data.id_invitation || null)
+      const savedInvitationId = data.data.id_invitation || null;
+      setInvitationId(savedInvitationId);
+
+      await saveTempInvitation(previewRef, savedInvitationId, invitationData.user_id_user);
 
       Swal.fire({
         title: '¡Éxito!',
@@ -261,32 +199,20 @@ function Templates() {
         confirmButtonText: 'Sí, agregar invitados',
         cancelButtonText: 'No, más tarde',
       }).then((result) => {
-        if (result.isConfirmed) {
-          setShowGuestModal(true) // Abre el modal de invitados
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          // Redirige a /tracking/:invitationId cuando dice "No"
-          window.location.href = `/mis-eventos`
-        }
-      })
+        if (result.isConfirmed) setShowGuestModal(true);
+        else if (result.dismiss === Swal.DismissReason.cancel) window.location.href = `/mis-eventos`;
+      });
 
-      setInvitationData((prev) => ({
-        ...prev,
-        address: '',
-        scheduled_at: '',
-      }))
-    } catch (error) {
-      console.error('Error al guardar la invitación:', error)
-      Swal.fire(
-        'Error',
-        error.message ||
-          'Ocurrió un error inesperado al guardar la invitación.',
-        'error'
-      )
+      setInvitationData({ ...invitationData, address: '', scheduled_at: '' });
+      setTexts([]);
+      setImages([]);
+    } catch (err) {
+      console.error('Error al guardar la invitación:', err);
+      Swal.fire('Error', err.message || 'Ocurrió un error inesperado', 'error');
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
-
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       {showGuestModal && (
@@ -595,6 +521,7 @@ function Templates() {
                 'Guardar Invitación'
               )}
             </button>
+            
           </div>
         </div>
       </div>
