@@ -15,6 +15,7 @@ import Home from './Pages/user/Home'
 import AdminHome from './Pages/admin/Home'
 import ResetPassword from './Components/ResetPassword'
 import { AuthProvider } from './Context/AuthContext'
+import Confirm from './Pages/User/Confirm_invitation'
 
 // Componente para obtener el role desde el token
 function getRoleFromToken() {
@@ -99,6 +100,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="confirm-invitation/:uuId" element={<Confirm />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* Rutas privadas para admin */}
