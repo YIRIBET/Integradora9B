@@ -9,6 +9,7 @@ import {
 import UserRegisterModal from '../../Components/admin/UserRegisterModal'
 // Importa SweetAlert
 import Swal from 'sweetalert2'
+const API_BASE_URL = 'http://localhost:3000/api';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([])
@@ -20,7 +21,7 @@ const UserManagement = () => {
   useEffect(() => {
     // Fetch users from the API
     axios
-      .get('http://localhost:3000/api/users/')
+      .get(`${API_BASE_URL}/users/`)
       .then((response) => {
         setUsers(response.data.data) // Adapt to the API response structure
         console.log('Usuarios obtenidos:', response.data.data)
@@ -60,7 +61,7 @@ const UserManagement = () => {
   const handleUserSaved = (msg) => {
     setShowModal(false)
     setEditUser(null)
-    axios.get('http://localhost:3000/api/users/').then((res) => {
+    axios.get(`${API_BASE_URL}/users/`).then((res) => {
       setUsers(res.data.data)
       if (msg) {
         Swal.fire({
@@ -87,11 +88,11 @@ const UserManagement = () => {
     })
     if (!result.isConfirmed) return
     try {
-      await axios.put(`http://localhost:3000/api/users/${user.id_user}`, {
+      await axios.put(`${API_BASE_URL}/users/${user.id_user}`, {
         status: 0,
       })
       // Refresca la lista de usuarios
-      const res = await axios.get('http://localhost:3000/api/users/')
+      const res = await axios.get(`${API_BASE_URL}/users/`)
       setUsers(res.data.data)
       Swal.fire({
         icon: 'success',

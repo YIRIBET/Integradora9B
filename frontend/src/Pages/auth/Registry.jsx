@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
+const API_BASE_URL = 'http://localhost:3000/api';
 
 function Registry() {
   const [form, setForm] = useState({
@@ -22,7 +23,7 @@ function Registry() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('http://localhost:3000/api/users/', {
+      const response = await fetch(`${API_BASE_URL}/users/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
