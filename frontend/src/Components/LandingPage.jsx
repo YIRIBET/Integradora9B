@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+const API_BASE_URL = 'http://localhost:3000/api';
+
 
 import hacets from "../assets/hacets.png";
 
@@ -7,7 +9,7 @@ function LandigPage() {
   const [templates, setTemplates] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/templates/")
+    fetch(`${API_BASE_URL}/templates/`)
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {

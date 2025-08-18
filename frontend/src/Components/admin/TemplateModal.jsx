@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
+const API_BASE_URL = 'http://localhost:3000/api';
 
 const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
   const [form, setForm] = useState({
@@ -16,7 +17,7 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
 
   useEffect(() => {
     // Obtener tipos de evento
-    fetch('http://localhost:3000/api/eventType/')
+    fetch(`${API_BASE_URL}/eventType/`)
       .then((res) => res.json())
       .then((data) => {
         setEventTypes(data.data || [])
@@ -61,7 +62,7 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
     if (!newEventTypeName.trim()) return
     setShowEventTypeModal(false)
     try {
-      const res = await fetch('http://localhost:3000/api/eventType/', {
+      const res = await fetch(`${API_BASE_URL}/eventType/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newEventTypeName }),
@@ -75,7 +76,7 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
         })
         setNewEventTypeName('')
         // Refresca tipos de evento
-        fetch('http://localhost:3000/api/eventType/')
+        fetch(`${API_BASE_URL}/eventType/`)
           .then((res) => res.json())
           .then((data) => setEventTypes(data.data || []))
       } else {
@@ -120,14 +121,14 @@ const TemplateModal = ({ open, onClose, onTemplateSaved, template }) => {
       let response
       if (template) {
         response = await fetch(
-          `http://localhost:3000/api/templates/${template.id_templates}`,
+          `${API_BASE_URL}/templates/${template.id_templates}`,
           {
             method: 'PUT',
             body: formData,
           }
         )
       } else {
-        response = await fetch('http://localhost:3000/api/templates', {
+        response = await fetch(`${API_BASE_URL}/templates`, {
           method: 'POST',
           body: formData,
         })

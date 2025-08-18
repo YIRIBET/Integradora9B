@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 // Importa SweetAlert
 import Swal from 'sweetalert2'
+const API_BASE_URL = 'http://localhost:3000/api';
 
 const UserRegisterModal = ({ open, onClose, onUserSaved, user }) => {
   const [form, setForm] = useState({
@@ -62,7 +63,7 @@ const UserRegisterModal = ({ open, onClose, onUserSaved, user }) => {
         // Edición SIN enviar password
         const { password, email, role, ...formWithoutPassword } = form
         response = await fetch(
-          `http://localhost:3000/api/users/${user.id_user}`,
+          `${API_BASE_URL}/users/${user.id_user}`,
           {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -71,7 +72,7 @@ const UserRegisterModal = ({ open, onClose, onUserSaved, user }) => {
         )
       } else {
         // Registro
-        response = await fetch('http://localhost:3000/api/users/', {
+        response = await fetch(`${API_BASE_URL}/users/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form),
