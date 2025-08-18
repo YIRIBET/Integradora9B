@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 function GuestModal({ guests, setGuests, invitationId, onClose }) {
   // Estado separado para los nuevos invitados que se van agregando en esta sesión
@@ -57,7 +58,7 @@ function GuestModal({ guests, setGuests, invitationId, onClose }) {
         invitationId
       };
 
-      const res = await fetch('http://localhost:3000/api/guest/', {
+      const res = await fetch(`${API_BASE_URL}/guest/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

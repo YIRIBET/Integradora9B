@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import GuestModal from "../../Components/user/GuestModal";
+const API_BASE_URL = 'http://localhost:3000/api';
 
 function EmailPreviewModal({ guest, invitation, onClose, onSend }) {
   const url = `${window.location.origin}/invitation-response/${guest.id_guest}`;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -154,7 +155,7 @@ function Traking() {
         setLoading(true);
 
         const guestsResponse = await fetch(
-          `http://localhost:3000/api/guest/${invitationId}`,
+          `${API_BASE_URL}/guest/${invitationId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -182,7 +183,7 @@ function Traking() {
         setGuests(formattedGuests);
 
         const invitationResponse = await fetch(
-          `http://localhost:3000/api/invitation/${invitationId}`,
+          `${API_BASE_URL}/invitation/${invitationId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -247,7 +248,7 @@ function Traking() {
 
   const sendEmailInvitation = async (guestId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/guest/send-invitation/${guestId}`, {
+      const response = await fetch(`${API_BASE_URL}/guest/send-invitation/${guestId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -297,7 +298,7 @@ function Traking() {
 
       if (formValues) {
         const response = await fetch(
-          `http://localhost:3000/api/invitation/${invitationId}`,
+          `${API_BASE_URL}/invitation/${invitationId}`,
           {
             method: "PUT",
             headers: {

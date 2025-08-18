@@ -2,6 +2,7 @@ import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2' // Importar SweetAlert
 import { AuthContext } from '../../Context/AuthContext'
+const API_BASE_URL = 'http://localhost:3000/api';
 
 function Login() {
   const [email, setEmail] = useState('')
@@ -14,7 +15,7 @@ function Login() {
     e.preventDefault()
     setIsLoading(true) // Activar estado de carga
 
-    fetch('http://localhost:3000/api/auth/', {
+    fetch(`${API_BASE_URL}/auth/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),

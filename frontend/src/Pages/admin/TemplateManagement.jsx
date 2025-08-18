@@ -7,6 +7,7 @@ import {
   PlusIcon,
 } from '@heroicons/react/24/outline'
 import TemplateModal from '../../Components/admin/TemplateModal'
+const API_BASE_URL = 'http://localhost:3000/api';
 
 const TemplateManagement = () => {
   const [templates, setTemplates] = useState([])
@@ -21,7 +22,7 @@ const TemplateManagement = () => {
 
   const fetchTemplates = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/templates')
+      const res = await axios.get(`${API_BASE_URL}/templates`)
       setTemplates(res.data.data)
     } catch (error) {
       Swal.fire({
@@ -71,7 +72,8 @@ const TemplateManagement = () => {
     if (!result.isConfirmed) return
     try {
       await axios.delete(
-        `http://localhost:3000/api/templates/${template.id_templates}`,
+        `${API_BASE_URL}/templates/${template.id_templates}`
+,
         {
           status: template.status === 1 ? 0 : 1,
         }

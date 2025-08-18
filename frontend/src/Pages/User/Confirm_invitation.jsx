@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 const ConfirmInvitation = () => {
     const [status, setStatus] = useState(null);
@@ -71,7 +72,7 @@ const ConfirmInvitation = () => {
         setError(null);
 
         try {
-            const response = await fetch(`https://pn0tsccd-3000.usw3.devtunnels.ms/api/confirm-invitation/`, {
+            const response = await fetch(`${API_BASE_URL}/confirm-invitation/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

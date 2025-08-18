@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
+const API_BASE_URL = 'http://localhost:3000/api';
+
 
 function Profile() {
     const [recoveryEmail, setRecoveryEmail] = useState("");
@@ -8,7 +10,7 @@ function Profile() {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:3000/api/passwordRecovery/forgot-password", {
+            const response = await fetch(`${API_BASE_URL}/passwordRecovery/forgot-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

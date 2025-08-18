@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import GuestModal from '../../Components/user/GuestModal';
 import { toPng } from 'html-to-image';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 function Templates() {
   const [templates, setTemplates] = useState([]);
@@ -42,7 +43,7 @@ function Templates() {
       }));
     }
 
-    fetch(`http://localhost:3000/api/templates/${id}/image`)
+    fetch(`${API_BASE_URL}/templates/${id}/image`)
       .then(res => res.json())
       .then(data => {
         if (data.success) setTemplates(Array.isArray(data.data) ? data.data : [data.data]);
@@ -58,7 +59,7 @@ function Templates() {
       const userId = localStorage.getItem('userId');
       if (!userId) return;
 
-      const response = await fetch(`http://localhost:3000/api/tempInvitation/get/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/tempInvitation/get/${userId}`);
       const data = await response.json();
 
       if (data.success && data.data.length > 0) {
@@ -438,7 +439,7 @@ function Templates() {
 
       console.log('Enviando imagen al servidor...');
       
-      const res = await fetch('http://localhost:3000/api/tempInvitation/save', {
+      const res = await fetch(`${API_BASE_URL}/tempInvitation/save`, {
         method: 'POST',
         body: formData,
         headers: { 
@@ -481,7 +482,7 @@ function Templates() {
 
       console.log('Guardando evento en base de datos...');
       
-      const res = await fetch('http://localhost:3000/api/invitation/', {
+      const res = await fetch(`${API_BASE_URL}/invitation/`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json', 
@@ -534,7 +535,7 @@ function Templates() {
       });
 
     } catch (error) {
-      console.error('❌ Error en el proceso de guardado:', error);
+      console.error('Error en el proceso de guardado:', error);
       Swal.fire({
         title: 'Error',
         text: error.message || 'Ocurrió un error inesperado al guardar',

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+const API_BASE_URL = 'http://localhost:3000/api';
+
 
 const ResetPassword = () => {
     const { token } = useParams();
@@ -10,7 +12,7 @@ const ResetPassword = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:3000/api/passwordRecovery/reset-password", {
+            const response = await fetch(`${API_BASE_URL}/passwordRecovery/reset-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
