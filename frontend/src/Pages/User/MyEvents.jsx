@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { CalendarDays, MapPin, Users } from "lucide-react"; 
+const API_BASE_URL = 'http://localhost:3000/api';
+
 
 function MyEvent() {
   const [invitation, setInvitation] = useState([]);
@@ -25,7 +27,7 @@ function MyEvent() {
     const fetchInvitation = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/invitation/findByUser/${userId}`,
+          `${API_BASE_URL}/invitation/findByUser/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
