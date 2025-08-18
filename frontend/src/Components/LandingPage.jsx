@@ -1,4 +1,24 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+import hacets from "../assets/hacets.png";
+
 function LandigPage() {
+  const [templates, setTemplates] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/templates/")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          setTemplates(data.data);
+        }
+      })
+      .catch((error) =>
+        console.error("Error al cargar las plantillas:", error)
+      );
+  }, []);
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="grid grid-cols-2 md:grid-cols-2 gap-2 me-6">
@@ -16,10 +36,16 @@ function LandigPage() {
 
           <div className="text-left">
             <div className="flex flex-wrap gap-4 mt-6">
-              <a href="/login" className="bg-pink-500 hover:bg-pink-600 text-white font-medium py-2 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                Empezar
+              <a
+                href="/login"
+                className="bg-pink-500 hover:bg-pink-600 text-white font-medium py-2 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+              >
+                Iniciciar sesión
               </a>
-              <a href="/Home" className="bg-transparent hover:bg-pink-100 text-pink-500 font-medium py-2 px-8 rounded-full border-2 border-pink-500 transition-all duration-300">
+              <a
+                href="/Home"
+                className="bg-transparent hover:bg-pink-100 text-pink-500 font-medium py-2 px-8 rounded-full border-2 border-pink-500 transition-all duration-300"
+              >
                 Ver plantillas
               </a>
             </div>
@@ -28,8 +54,7 @@ function LandigPage() {
         <div className="mb-10 bg-[#f2d7fc] rounded-lg p-4">
           <img
             className="mx-auto w-full h-auto max-w-xl rounded-lg"
-            src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg"
-            alt="Descripción de la imagen"
+            src={hacets}
           />
         </div>
       </div>
@@ -112,7 +137,6 @@ function LandigPage() {
               stroke-width="1.5"
               stroke="white"
               className="inline-block bg-green-400 rounded-full p-4 w-6 h-6 md:w-10 md:h-10 lg:w-17 lg:h-17"
-
             >
               <path
                 stroke-linecap="round"
@@ -167,203 +191,7 @@ function LandigPage() {
           </div>
         </div>
       </div>
-      <div className="bg-white justify-center align-center text-center">
-        <p className="font-bold  text-xl md:text-2xl lg:text-3xl xl:text-4xl mb-6 mt-10 leading-tight">
-          Funciones potentes
-        </p>
-        <p className="text-l md:text-xl text-gray-700 mb-8 leading-relaxed max-w-prose mx-auto">
-          Todo lo que necesitas para crear, gestionar y realizar un seguimiento
-          de tus invitaciones a eventos
-        </p>
-        <div className="grid grid-cols-4 md:grid-cols-3 gap-4 mt-20 m-6">
-          <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6 inline-block  mb-4 bg-[#f2d7fc] rounded-full p-12"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                Elija una plantilla
-              </h5>
-            </a>
-            <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
-              Explore nuestra colección de hermosas plantillas diseñadas
-              profesionalmente.
-            </p>
-          </div>
-          <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6 inline-block  mb-4 bg-[#f2d7fc] rounded-full p-12"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                Elija una plantilla
-              </h5>
-            </a>
-            <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
-              Explore nuestra colección de hermosas plantillas diseñadas
-              profesionalmente.
-            </p>
-          </div>
-          <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6 inline-block  mb-4 bg-[#f2d7fc] rounded-full p-12"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                Elija una plantilla
-              </h5>
-            </a>
-            <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
-              Explore nuestra colección de hermosas plantillas diseñadas
-              profesionalmente.
-            </p>
-          </div>
-          <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6 inline-block  mb-4 bg-[#f2d7fc] rounded-full p-12"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                Elija una plantilla
-              </h5>
-            </a>
-            <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
-              Explore nuestra colección de hermosas plantillas diseñadas
-              profesionalmente.
-            </p>
-          </div>
-          <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6 inline-block  mb-4 bg-[#f2d7fc] rounded-full p-12"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                Elija una plantilla
-              </h5>
-            </a>
-            <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
-              Explore nuestra colección de hermosas plantillas diseñadas
-              profesionalmente.
-            </p>
-          </div>
-          <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6 inline-block  mb-4 bg-[#f2d7fc] rounded-full p-12"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-
-            <a href="#">
-              <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                Elija una plantilla
-              </h5>
-            </a>
-            <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
-              Explore nuestra colección de hermosas plantillas diseñadas
-              profesionalmente.
-            </p>
-          </div>
-        </div>
-      </div>
+     
       <div className="justify-center align-center text-center mt-10 mb-10 ">
         <p className="font-bold  text-xl md:text-2xl lg:text-3xl xl:text-4xl mb-6 leading-tight">
           Cómo funciona
@@ -371,151 +199,73 @@ function LandigPage() {
         <p className="text-l md:text-xl text-gray-700 mb-8 leading-relaxed max-w-prose mx-auto">
           Crea invitaciones impresionantes en solo cuatro sencillos pasos
         </p>
-        <div className="grid grid-cols-4 md:grid-cols-3 gap-3 mt-20 m-6">
-          <div class="w-full max-w-lg bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <a href="#" class="block aspect-video overflow-hidden">
-              <img
-                class="w-full h-full object-cover"
-                src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg"
-                alt="Invitación de boda elegante"
-              />
-            </a>
-            <div class="px-4 py-3">
-              <a href="#">
-                <h5 class="text-lg text-start  tracking-tight text-gray-900 dark:text-white">
-                  Boda elegante
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 m-6">
+          {templates.slice(0, 6).map((template) => (
+            <div
+              key={template.id_templates}
+              className="w-full max-w-lg bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
+            >
+              <Link
+                to={`/templates/${template.id_templates}`}
+                className="block aspect-video overflow-hidden"
+              >
+                <img
+                  className="w-full h-full object-cover"
+                  src={template.image}
+                  alt={template.template_name}
+                />
+              </Link>
+              <div className="px-4 py-3">
+                <h5 className="text-lg text-start tracking-tight text-gray-900 dark:text-white">
+                  {template.template_name}
                 </h5>
-              </a>
+              </div>
             </div>
-          </div>
-          <div class="w-full max-w-lg bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <a href="#" class="block aspect-video overflow-hidden">
-              <img
-                class="w-full h-full object-cover"
-                src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg"
-                alt="Invitación de boda elegante"
-              />
-            </a>
-            <div class="px-4 py-3">
-              <a href="#">
-                <h5 class="text-lg text-start  tracking-tight text-gray-900 dark:text-white">
-                  Boda elegante
-                </h5>
-              </a>
-            </div>
-          </div>
-          <div class="w-full max-w-lg bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <a href="#" class="block aspect-video overflow-hidden">
-              <img
-                class="w-full h-full object-cover"
-                src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg"
-                alt="Invitación de boda elegante"
-              />
-            </a>
-            <div class="px-4 py-3">
-              <a href="#">
-                <h5 class="text-lg text-start  tracking-tight text-gray-900 dark:text-white">
-                  Boda elegante
-                </h5>
-              </a>
-            </div>
-          </div>
-          <div class="w-full max-w-lg bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <a href="#" class="block aspect-video overflow-hidden">
-              <img
-                class="w-full h-full object-cover"
-                src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg"
-                alt="Invitación de boda elegante"
-              />
-            </a>
-            <div class="px-4 py-3">
-              <a href="#">
-                <h5 class="text-lg text-start  tracking-tight text-gray-900 dark:text-white">
-                  Boda elegante
-                </h5>
-              </a>
-            </div>
-          </div>
-          <div class="w-full max-w-lg bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <a href="#" class="block aspect-video overflow-hidden">
-              <img
-                class="w-full h-full object-cover"
-                src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg"
-                alt="Invitación de boda elegante"
-              />
-            </a>
-            <div class="px-4 py-3">
-              <a href="#">
-                <h5 class="text-lg text-start  tracking-tight text-gray-900 dark:text-white">
-                  Boda elegante
-                </h5>
-              </a>
-            </div>
-          </div>
-          <div class="w-full max-w-lg bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <a href="#" class="block aspect-video overflow-hidden">
-              <img
-                class="w-full h-full object-cover"
-                src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg"
-                alt="Invitación de boda elegante"
-              />
-            </a>
-            <div class="px-4 py-3">
-              <a href="#">
-                <h5 class="text-lg text-start  tracking-tight text-gray-900 dark:text-white">
-                  Boda elegante
-                </h5>
-              </a>
-            </div>
-          </div>
+          ))}
         </div>
+
         <button className="mt-10">
           <a
-            href="#"
+            href="/home"
             className="bg-transparent hover:bg-pink-100 text-pink-500 font-medium py-2 px-8 rounded-full border-2 border-pink-500 transition-all duration-300"
           >
             Ver más plantillas
           </a>
         </button>
       </div>
-      <div className="bg-white justify-center align-center text-center mt-20 mb-10  ">
-        <p className="font-bold  text-xl md:text-2xl lg:text-3xl xl:text-4xl mb-6 mt-10 leading-tight">
-          Lo que dicen nuestros usuarios
+       <div className="bg-white justify-center align-center text-center m-7 mt-10 mb-10 p-10 rounded-lg shadow-lg">
+        <p className="font-bold text-xl md:text-2xl lg:text-3xl xl:text-4xl  leading-tight">
+          Funciones potentes
         </p>
         <p className="text-l md:text-xl text-gray-700 mb-8 leading-relaxed max-w-prose mx-auto">
-          Únase a miles de organizadores de eventos satisfechos que confían en
-          HACETS
+          Todo lo que necesitas para crear, gestionar y realizar un seguimiento
+          de tus invitaciones a eventos
         </p>
-        <div className="grid grid-cols-4 md:grid-cols-3 gap-4 mt-20 m-6">
+        <div className="grid grid-cols-4 md:grid-cols-3 gap-4 mt-20 m-15 ">
           <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6 inline-block  mb-4 bg-[#f2d7fc] rounded-full p-12"
+              stroke="#f472b6"
+              class="size-9"
             >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42"
               />
             </svg>
 
             <a href="#">
               <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                Elija una plantilla
+                Plantillas personalizables
               </h5>
             </a>
             <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
-              Explore nuestra colección de hermosas plantillas diseñadas
-              profesionalmente.
+              Elija entre cientos de plantillas diseñadas profesionalmente y
+              adáptelas a su gusto.
             </p>
           </div>
           <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
@@ -524,29 +274,24 @@ function LandigPage() {
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6 inline-block  mb-4 bg-[#f2d7fc] rounded-full p-12"
+              stroke="#f472b6"
+              class="size-9"
             >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                d="M7.5 7.5h-.75A2.25 2.25 0 0 0 4.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25h-.75m-6 3.75 3 3m0 0 3-3m-3 3V1.5m6 9h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-.75"
               />
             </svg>
 
             <a href="#">
               <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                Elija una plantilla
+                Descargar Imagen
               </h5>
             </a>
             <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
-              Explore nuestra colección de hermosas plantillas diseñadas
-              profesionalmente.
+              Descargue sus invitaciones como imágenes de alta calidad para
+              compartir
             </p>
           </div>
           <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
@@ -555,8 +300,8 @@ function LandigPage() {
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
-              stroke="currentColor"
-              class="size-6 inline-block  mb-4 bg-[#f2d7fc] rounded-full p-12"
+              stroke="#f472b6"
+              class="size-9"
             >
               <path
                 stroke-linecap="round"
@@ -572,12 +317,12 @@ function LandigPage() {
 
             <a href="#">
               <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-                Elija una plantilla
+                Seguimiento de RSVP
               </h5>
             </a>
             <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
-              Explore nuestra colección de hermosas plantillas diseñadas
-              profesionalmente.
+              Recopile y organice automáticamente las respuestas de los
+              invitados con seguimiento inteligente
             </p>
           </div>
         </div>

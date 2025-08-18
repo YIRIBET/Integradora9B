@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { AuthContext } from '../Context/AuthContext'
+import Logo from '../assets/LogoHACETS.png'
 
 // Función para obtener el role del token
 function getRoleFromToken() {
@@ -29,7 +30,7 @@ const Navbar = () => {
           className="flex items-center space-x-3 rtl:space-x-reverse"
         >
           <img
-            src="./assets/LogoHACETS.png"
+            src={Logo}
             alt="HACETS Logo"
             className="h-8 w-8"
           />

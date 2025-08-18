@@ -47,13 +47,13 @@ const Footer = () => {
               <h2 className="mb-6 text-sm font-semibold uppercase">Contacto</h2>
               <ul className="text-gray-400 font-medium">
                 <li className="mb-4">
-                  <span className="hover:underline">contacto@tudominio.com</span>
+                  <span className="hover:underline">redbullbackendtm@gmail.com</span>
                 </li>
                 <li className="mb-4">
-                  <span className="hover:underline">+1 (234) 567-890</span>
+                  <span className="hover:underline">+52 (777) 252 69 69</span>
                 </li>
                 <li>
-                  <span className="hover:underline">Dirección 123, Ciudad</span>
+                  <span className="hover:underline">Dirección Av.universidad 1</span>
                 </li>
               </ul>
             </div>
@@ -82,7 +82,7 @@ const Footer = () => {
         {/* Copyright y créditos */}
         <div className="sm:flex sm:items-center sm:justify-between">
           <span className="text-sm text-gray-400 sm:text-center">
-            © {new Date().getFullYear()} <Link to="/" className="hover:underline">MiEmpresa™</Link>. Todos los derechos reservados.
+            © {new Date().getFullYear()} <Link to="/" className="hover:underline">HACETS™</Link>. Todos los derechos reservados.
           </span>
           <div className="flex mt-4 sm:justify-center sm:mt-0">
             {/* Iconos de redes sociales */}
